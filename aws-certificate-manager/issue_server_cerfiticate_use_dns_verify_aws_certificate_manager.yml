@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Issue Server Certificate, Use DNS Verify from AWS Certificate Manager.
+#
+# Author: Ryosuke KUTSUNA. <kutsuna@serverworks.co.jp>
+#
+# 指定したFQDNのサーバ証明書をDNS検証付きで発行する。
+#
+# 実行後、指定したHostZoneにDNS検証用レコードが追加されます。
+# DNS検証用レコードは証明書発行後に削除して構いません。
+#
+# you may change follows...
+# <fixme: FQDN>: 発行してもらう証明書のFQDNを指定する。
+# <fixme: hostzone_id>: Route53で作成した HostZone のIDを指定する。
+#                OutputsでHostZone IDをExportしているならば、
+#                Fn::ImportValue: Exported_id などで指定できる。
+
+Parameters:
+  myFqdn:
+    Type: String
+    Default: <fixme: FQDN>
+
+Resources:
+  myCert:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref myFqdn
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: !Ref myFqdn
+          HostedZoneId: <fixme: hostzone_id>
+
+Outputs:
+  myCert:
+    Description: server certificate
+    Value: !Ref myCert
+    Export:
+      Name: certificate-id
